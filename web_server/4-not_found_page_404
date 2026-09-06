@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Configures nginx with a custom 404 page containing "Ceci n'est pas une page"
+apt-get update -y
+apt-get install -y nginx
+
+echo "Holberton School" > /var/www/html/index.html
+echo "Ceci n'est pas une page" > /var/www/html/404.html
+
+# Keep a pristine copy of the default config so re-running this script
+# never duplicates the inserted directives
+if [ ! -f /etc/nginx/sites-available/default.orig ]; then
+	cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.orig
+fi
+cp /etc/nginx/sites-available/default.orig /etc/nginx/sites-available/default
+
+sed -i '/listen 80 default_server;/a\
+\tlocation /redirect_me {\
+\t\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\
+\t}\
+\terror_page 404 /404.html;' /etc/nginx/sites-available/default
+
+service nginx restart

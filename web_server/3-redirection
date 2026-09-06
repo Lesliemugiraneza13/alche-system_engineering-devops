@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Configures nginx to redirect /redirect_me to another page with a 301
+apt-get update -y
+apt-get install -y nginx
+
+echo "Holberton School" > /var/www/html/index.html
+
+# Keep a pristine copy of the default config so re-running this script
+# never duplicates the inserted location block
+if [ ! -f /etc/nginx/sites-available/default.orig ]; then
+	cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.orig
+fi
+cp /etc/nginx/sites-available/default.orig /etc/nginx/sites-available/default
+
+sed -i '/listen 80 default_server;/a\
+\tlocation /redirect_me {\
+\t\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\
+\t}' /etc/nginx/sites-available/default
+
+service nginx restart
